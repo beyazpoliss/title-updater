@@ -17,6 +17,7 @@ minecraft-one-eighteen-two = "1.18.2-R0.1-SNAPSHOT"
 minecraft-one-nineteen-four = "1.19.4-R0.1-SNAPSHOT"
 minecraft-one-twenty-six = "1.20.6-R0.1-SNAPSHOT"
 minecraft-one-twenty-one-six = "1.21.6-R0.1-SNAPSHOT"
+minecraft-one-twenty-one-ten = "1.21.10-R0.1-SNAPSHOT"
 
 [libraries]
 nexus-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.34.0" }

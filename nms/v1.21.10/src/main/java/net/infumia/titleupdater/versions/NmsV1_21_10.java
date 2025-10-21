@@ -1,0 +1,48 @@
+package net.infumia.titleupdater.versions;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.mojang.serialization.JsonOps;
+import net.infumia.titleupdater.Nms;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.world.inventory.MenuType;
+import org.bukkit.craftbukkit.CraftRegistry;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftContainer;
+import org.bukkit.entity.Player;
+
+public final class NmsV1_21_10 implements Nms {
+
+    public static final Nms INSTANCE = new NmsV1_21_10();
+
+    @Override
+    public void updateTitle(final Player player, final Object title) {
+        final var serverPlayer = ((CraftPlayer) player).getHandle();
+        final var containerId = serverPlayer.containerMenu.containerId;
+        final MenuType<?> windowType = CraftContainer.getNotchInventoryType(
+            player.getOpenInventory().getTopInventory()
+        );
+        serverPlayer.connection.send(
+            new ClientboundOpenScreenPacket(containerId, windowType, this.toComponent(title))
+        );
+        player.updateInventory();
+    }
+
+    private Component toComponent(final Object text) {
+        if (!(text instanceof String) && !(text instanceof JsonElement)) {
+            throw new IllegalArgumentException("Text must be String or JsonElement!");
+        }
+        final Component component;
+        if (text instanceof String) {
+            component = Component.literal((String) text);
+        } else {
+            component = ComponentSerialization.CODEC.parse(
+                CraftRegistry.getMinecraftRegistry().createSerializationContext(JsonOps.INSTANCE),
+                (JsonElement) text
+            ).getOrThrow(JsonParseException::new);
+        }
+        return component;
+    }
+}
